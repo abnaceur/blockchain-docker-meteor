@@ -1,0 +1,38 @@
+version: '2'
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      #- ./nginx/nginx-custom.conf:/etc/nginx/conf.d/nginx_custom.conf:ro
+      #- ./nginx/self-signed-certificate:/etc/nginx/certs:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    container_name: dapp_nginx
+  app:
+    build: docker/app/
+    volumes:
+      - ./:/var/www/html:rw
+    environment:
+      - VIRTUAL_HOST=dapp.TCM.dev
+    env_file:
+      - .env
+    ports:
+      - 3000:3000
+      - 8545:8545
+    container_name: TCM_dapp
+
+  meteor:
+    image: ulexus/meteor
+    ports:
+    - "85:85"
+    links:
+    - mongo
+    environment:
+    - REPO=https://me-me@bitbucket.org/me-me/blockchain-docker.git
+    - ROOT_URL=http://dapp.tcm.dev/
+  mongo:
+    image: mongo
+    ports:
+    - "27017:27017"
