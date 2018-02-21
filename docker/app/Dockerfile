@@ -9,7 +9,7 @@ ENV SSH_USERPASS=newpass
 RUN apt-get update -y; apt-get dist-upgrade -y
 RUN apt-get install -y openssh-server software-properties-common curl git
 RUN add-apt-repository -y ppa:ethereum/ethereum; apt-get update -y
-RUN apt-get install -y geth solc
+RUN apt-get install -y geth solc 
 
 RUN useradd -m geth -s /bin/bash
 RUN echo geth:$SSH_USERPASS | chpasswd

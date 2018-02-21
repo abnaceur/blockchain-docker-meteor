@@ -20,7 +20,6 @@ services:
       - .env
     ports:
       - 3000:3000
-      - 8545:8545
     container_name: TCM_dapp
 
   meteor:
@@ -36,3 +35,13 @@ services:
     image: mongo
     ports:
     - "27017:27017"
+  
+  go-ethereum:
+    image: ethereum/client-go
+    container_name: 'eth'
+    volumes:
+    - "./chaindata:/root/.ethereum" #  remplacer /srv/eth/datadir par le chemin ou vous voulez stocker la blockchain
+    ports:
+    - 30303:30303
+    - 8545:8545 # Port JSON RPC, optionnel
+    command: geth -datadir=chaindata init /etherum-genesis/genesis.json --rpc --rpccorsdomain "*" --rpcaddr "0.0.0.0" --rpcport "8545" --rpcapi "admin,db,eth,debug,miner,net,shh,txpool,personal,web3"  --networkid 1  --nat "any" --syncmode=light console # --syncmode=light est optionnel mais permet de télécharger la blockchain plus rapidement.
