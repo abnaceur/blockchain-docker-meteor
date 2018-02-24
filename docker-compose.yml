@@ -21,21 +21,18 @@ services:
     ports:
       - 3000:3000
     container_name: TCM_dapp
-
-  meteor:
-    image: ulexus/meteor
-    ports:
-    - "85:85"
-    links:
-    - mongo
-    environment:
-    - REPO=https://me-me@bitbucket.org/me-me/blockchain-docker.git
-    - ROOT_URL=http://dapp.tcm.dev/
+  
   mongo:
     image: mongo
     ports:
     - "27017:27017"
   
+  browser-solidity:
+    build: browser-solidity
+    ports:
+      - "8080:8080"
+    container_name: Solidity_browser
+
   go-ethereum:
     image: ethereum/client-go
     container_name: 'eth'
@@ -44,4 +41,4 @@ services:
     ports:
     - 30303:30303
     - 8545:8545 # Port JSON RPC, optionnel
-    command: geth -datadir=chaindata init /etherum-genesis/genesis.json --rpc --rpccorsdomain "*" --rpcaddr "0.0.0.0" --rpcport "8545" --rpcapi "admin,db,eth,debug,miner,net,shh,txpool,personal,web3"  --networkid 1  --nat "any" --syncmode=light console # --syncmode=light est optionnel mais permet de télécharger la blockchain plus rapidement.
+    command: geth -datadir=chaindata init /etherum-genesis/genesis.json --rpc --rpccorsdomain "*" --rpcaddr "0.0.0.0" --rpcport "8545" --rpcapi "admin,db,eth,debug,miner,net,shh,txpool,personal,web3"  --networkid 1  --nat "any" --syncmode=light console
