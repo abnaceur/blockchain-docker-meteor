@@ -1,27 +1,61 @@
 version: '2'
 services:
-  nginx-proxy:
-    image: jwilder/nginx-proxy
-    ports:
-      - 80:80
-      - 443:443
+  bootstrap:
+    build: monitored-geth-client
+    restart: on-failure
+    container_name: bootstrap
+    hostname: bootstrap
+    links:
+      - netstats
+    entrypoint: /root/start.sh
+    command: '--datadir=~/.ethereum/devchain --nodekeyhex=091bd6067cb4612df85d9c1ff85cc47f259ced4d4cd99816b14f35650f59c322 --rpcapi "db,personal,eth,net,web3" --rpccorsdomain="*" --networkid=456719 --rpc --rpcaddr="0.0.0.0"'
     volumes:
-      #- ./nginx/nginx-custom.conf:/etc/nginx/conf.d/nginx_custom.conf:ro
-      #- ./nginx/self-signed-certificate:/etc/nginx/certs:ro
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-    container_name: dapp_nginx
+      - ./files/password:/root/files/password:ro
+      - ./files/genesis.json:/root/files/genesis.json:ro
+      - ./files/keystore:/root/.ethereum/devchain/keystore:rw
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "30303:30303"
+      - "30303:30303/udp"
+      - "8545:8545"
+  
+  eth:
+    build: monitored-geth-client
+    restart: on-failure
+    links:
+      - bootstrap
+      - netstats
+    entrypoint: /root/start.sh
+    volumes:
+      - ./files/password:/root/files/password:ro
+      - ./files/genesis.json:/root/files/genesis.json:ro
+      - ./files/keystore:/root/.ethereum/devchain/keystore:rw
+      - /etc/localtime:/etc/localtime:ro
+    command: '--datadir=~/.ethereum/devchain --rpccorsdomain="*" --networkid=456719 --rpc --bootnodes="enode://288b97262895b1c7ec61cf314c2e2004407d0a5dc77566877aad1f2a36659c8b698f4b56fd06c4a0c0bf007b4cfb3e7122d907da3b005fa90e724441902eb19e@XXX:30303"'
+  
+  netstats:
+    build: eth-netstats
+    restart: on-failure
+    container_name: netstats
+    environment:
+      - WS_SECRET=eth-net-stats-secret
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "3000:3000"
+  
   app:
     build: docker/app/
     volumes:
       - ./:/var/www/html:rw
     environment:
-      - VIRTUAL_HOST=dapp.TCM.dev
+      - VIRTUAL_HOST=dapp.dev.local
     env_file:
       - .env
     ports:
-      - 3000:3000
-    container_name: TCM_dapp
-  
+      - 80:80
+    container_name: dev_dapp
+
   mongo:
     image: mongo
     ports:
@@ -32,13 +66,3 @@ services:
     ports:
       - "8080:8080"
     container_name: Solidity_browser
-
-  go-ethereum:
-    image: ethereum/client-go
-    container_name: 'eth'
-    volumes:
-    - "./chaindata:/root/.ethereum" #  remplacer /srv/eth/datadir par le chemin ou vous voulez stocker la blockchain
-    ports:
-    - 30303:30303
-    - 8545:8545 # Port JSON RPC, optionnel
-    command: geth -datadir=chaindata init /etherum-genesis/genesis.json --rpc --rpccorsdomain "*" --rpcaddr "0.0.0.0" --rpcport "8545" --rpcapi "admin,db,eth,debug,miner,net,shh,txpool,personal,web3"  --networkid 1  --nat "any" --syncmode=light console

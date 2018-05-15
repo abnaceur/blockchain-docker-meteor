@@ -1,17 +1,17 @@
 FROM node
-MAINTAINER "Sylvain Laurent <s@6120.eu>"
 
-ADD browser-solidity /usr/src/browser-solidity
-#ADD set-default-docker-endpoint.patch /tmp/set-default-docker-endpoint.patch
+# Install dependency packages
+RUN apt-get update && \
+    apt-get install -y git-core
+
+# Install browser-solidity
+RUN mkdir -p /usr/src/browser-solidity
 WORKDIR /usr/src/browser-solidity
 
+RUN git clone https://github.com/ethereum/browser-solidity.git . &&\
+    git reset --hard 3448ce4be10f894ac6cc278d5ab9ca9131216c0f
 RUN npm install && \
-	npm run build && \
-	npm run pullremix && \
-	npm run linkremixcore && \
-	npm run linkremixlib && \
-	npm run linkremixsolidity \
-	npm run linkremixdebugger
+    npm run build
 
 EXPOSE 8080
-CMD ["npm","start"]
+CMD ["npm","run","serve"]

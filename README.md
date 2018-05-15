@@ -12,7 +12,7 @@ git clone git@git.thecodingmachine.com:tcm-projects/gdd.git
 Edit your `/etc/hosts` file:
 
 ```
-127.0.0.1   127.0.0.1 dapp.TCM.dev
+127.0.0.1   dapp.dev.local
 ```
 
 Build the environment:
@@ -35,12 +35,12 @@ P.S: The build may take some time don't worry be happy and grab a cup of tea :)
 
 ```bash
 # Start meteor on port 80.
-docker exec -d TCM_dapp  sh -c "cd /var/www/html && sudo meteor --unsafe-perm --port 80"
+docker exec -d dev_dapp  sh -c "cd /var/www/html && sudo meteor --unsafe-perm --port 80"
 ```
 
 ```bash
 # Now attach geth to the private network 
-docker exec -ti TCM_dapp  sh -c "cd /var/www/html && geth -datadir=chaindata/ attach"
+docker exec -ti dev_dapp  sh -c "cd /var/www/html && geth -datadir=chaindata/ attach"
 ```
 
 ```bash
@@ -153,7 +153,7 @@ admin.startRPC("go-ethereum", 8545, "*", "web3,net,eth") // Active l'API
 
 #### Start geth
 ```bash
-geth --rpc --rpccorsdomain "*" --rpcaddr "0.0.0.0" --rpcport "8545" --rpcapi "admin,db,eth,debug,miner,net,shh,txpool,personal,web3"  --networkid 1  --nat "any"
+geth --rpc --rpccorsdomain "*" --rpcaddr "0.0.0.0" --rpcport "8545" --rpcapi "admin,db,eth,debug,miner,net,shh,txpool,personal,web3"  --networkid 184  --nat "any" --dev
 ```
 
 #### Test connexion from your local machine

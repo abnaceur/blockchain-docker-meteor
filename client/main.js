@@ -10,7 +10,8 @@ Template.hello.onCreated(function helloOnCreated() {
 
 Template.hello.helpers({
   counter() {
-    return Template.instance().counter.get();
+    var balance = web3.eth.getBalance("0x007CcfFb7916F37F7AEEf05E8096ecFbe55AFc2f");
+    alert(balance);
   },
 });
 
