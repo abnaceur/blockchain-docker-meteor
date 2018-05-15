@@ -1,4 +1,4 @@
-TCM_Private-blockchain_dev
+Private-blockchain_dev
 =========================
 
 ## Install gdd development environment
@@ -6,7 +6,7 @@ TCM_Private-blockchain_dev
 Get the source:
 
 ```bash
-git clone git@git.thecodingmachine.com:tcm-projects/gdd.git
+git clone https://me-me@bitbucket.org/me-me/blockchain-docker.git
 ```
 
 Edit your `/etc/hosts` file:
@@ -39,14 +39,19 @@ docker exec -d dev_dapp  sh -c "cd /var/www/html && sudo meteor --unsafe-perm --
 ```
 
 ```bash
-# Now attach geth to the private network 
-docker exec -ti dev_dapp  sh -c "cd /var/www/html && geth -datadir=chaindata/ attach"
+# Now attach geth to your bootstrap node 
+docker exec -it bootstrap geth --datadir=~/.ethereum/devchain attach
 ```
 
 ```bash
 # Start the mist wallet 
-sudo ./linux-unpacked/mist --rpc chaindata/geth.ipc
+sudo ./linux-unpacked/mist --rpc http://localhost:8545
 ```
+
+So we will have access to : 
+Solidity-browser => http://dapp.dev.local:8080
+Monitoring window => http://dapp.dev.local:3000/
+Meteor front applicatio => http://dapp.dev.local/
 
 
 ### Help
